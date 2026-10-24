@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="bn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0B2852">
+    <meta name="description" content="Nexavira Shop-এর বিক্রয়, খরচ ও বিজ্ঞাপনের লাভ-ক্ষতির হিসাব।">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Business Calculation | Nexavira Shop</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --navy: #0B2852;
+            --cyan: #20C4D8;
+            --ink: #152b46;
+            --muted: #66788b;
+            --paper: #f7f8f6;
+            --line: #dce4e8;
+            --white: #fff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: "Noto Sans Bengali", "Segoe UI", Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        .site-header {
+            background: var(--white);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .header-inner {
+            display: flex;
+            width: min(1080px, calc(100% - 44px));
+            min-height: 76px;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin: 0 auto;
+        }
+
+        .brand {
+            display: inline-flex;
+            flex: 0 0 auto;
+            align-items: center;
+            gap: 11px;
+            color: var(--navy);
+            font-size: 16px;
+            font-weight: 750;
+        }
+
+        .brand-mark {
+            display: grid;
+            width: 35px;
+            height: 35px;
+            place-items: center;
+            border: 1px solid var(--navy);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .main-nav {
+            display: flex;
+            align-items: center;
+            gap: 23px;
+        }
+
+        .nav-link {
+            position: relative;
+            padding: 28px 0 25px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 650;
+        }
+
+        .nav-link:hover,
+        .nav-link[aria-current="page"] { color: var(--navy); }
+
+        .nav-link[aria-current="page"]::after {
+            position: absolute;
+            right: 0;
+            bottom: -1px;
+            left: 0;
+            height: 3px;
+            background: var(--cyan);
+            content: "";
+        }
+
+        .nav-link:focus-visible,
+        .brand:focus-visible,
+        input:focus-visible,
+        button:focus-visible {
+            outline: 3px solid var(--cyan);
+            outline-offset: 3px;
+        }
+
+        main {
+            width: min(1080px, calc(100% - 44px));
+            margin: 0 auto;
+            padding: 43px 0 48px;
+        }
+
+        .page-intro {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .small-label {
+            margin: 0 0 8px;
+            color: #61758b;
+            font-size: 11px;
+            font-weight: 750;
+            letter-spacing: 1.2px;
+        }
+
+        h1 {
+            margin: 0;
+            color: var(--navy);
+            font-size: clamp(27px, 4vw, 36px);
+            font-weight: 720;
+            letter-spacing: -.7px;
+            line-height: 1.3;
+        }
+
+        .intro-copy {
+            max-width: 650px;
+            margin: 9px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .currency-note {
+            flex: 0 0 auto;
+            padding: 8px 0 8px 13px;
+            border-left: 2px solid var(--cyan);
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .currency-note strong {
+            display: block;
+            color: var(--navy);
+            font-size: 12px;
+        }
+
+        .calculator-layout {
+            display: grid;
+            grid-template-columns: minmax(290px, .83fr) minmax(0, 1.45fr);
+            align-items: start;
+            gap: 22px;
+        }
+
+        .calculator-card,
+        .results-panel {
+            border: 1px solid var(--line);
+            background: var(--white);
+        }
+
+        .calculator-card { padding: 21px; }
+
+        .calculator-card h2 {
+            margin: 0;
+            color: var(--navy);
+            font-size: 16px;
+        }
+
+        .calculator-card > p {
+            margin: 6px 0 18px;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .calculator-fields {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px 10px;
+        }
+
+        .calculator-field { min-width: 0; }
+
+        .calculator-field label {
+            display: block;
+            min-height: 31px;
+            margin-bottom: 5px;
+            color: #52677e;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+        .calculator-field input {
+            width: 100%;
+            min-height: 39px;
+            padding: 8px 10px;
+            border: 1px solid #d5dfe5;
+            border-radius: 4px;
+            background: #fbfcfc;
+            color: var(--navy);
+            font: inherit;
+            font-size: 13px;
+        }
+
+        .calculator-field input:focus {
+            border-color: var(--cyan);
+            outline: 3px solid rgb(32 196 216 / 15%);
+        }
+
+        .calculator-actions {
+            display: flex;
+            gap: 9px;
+            margin-top: 18px;
+        }
+
+        .calculator-actions button {
+            min-height: 41px;
+            flex: 1;
+            border: 1px solid var(--navy);
+            border-radius: 4px;
+            cursor: pointer;
+            font: inherit;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .calculate-button {
+            background: var(--navy);
+            color: var(--white);
+        }
+
+        .calculate-button:hover { background: #163c70; }
+
+        .reset-button {
+            background: var(--white);
+            color: var(--navy);
+        }
+
+        .reset-button:hover { background: #f1f7f8; }
+
+        .results-panel { padding: 19px; }
+
+        .results-heading {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 12px;
+            padding-bottom: 13px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .results-heading h2 {
+            margin: 0;
+            color: var(--navy);
+            font-size: 15px;
+        }
+
+        .results-heading p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            border-top: 1px solid var(--line);
+            border-left: 1px solid var(--line);
+            margin-top: 14px;
+        }
+
+        .kpi-card {
+            min-width: 0;
+            padding: 13px 14px;
+            border-right: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .kpi-card span,
+        .metric-item span {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .kpi-card output {
+            display: block;
+            margin-top: 5px;
+            color: var(--navy);
+            font-size: clamp(17px, 2vw, 22px);
+            font-weight: 750;
+            overflow-wrap: anywhere;
+        }
+
+        .result-section { margin-top: 21px; }
+
+        .result-section h3 {
+            margin: 0 0 8px;
+            color: #61758b;
+            font-size: 10px;
+            font-weight: 750;
+            letter-spacing: .8px;
+        }
+
+        .breakdown-list { margin: 0; }
+
+        .breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 7px 0;
+            border-bottom: 1px solid #edf0f1;
+            font-size: 11px;
+        }
+
+        .breakdown-row:last-child { border-bottom: 0; }
+        .breakdown-row dt { color: var(--muted); }
+
+        .breakdown-row dd {
+            margin: 0;
+            color: var(--navy);
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            padding-top: 5px;
+        }
+
+        .metric-item output {
+            display: block;
+            margin-top: 5px;
+            color: var(--navy);
+            font-size: 13px;
+            font-weight: 750;
+            overflow-wrap: anywhere;
+        }
+
+        .campaign-status {
+            margin: 17px 0 0;
+            padding: 10px 12px;
+            border-left: 3px solid var(--cyan);
+            background: #f0fafb;
+            color: var(--navy);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .campaign-status[data-state="profit"] {
+            border-color: #17804b;
+            background: #eff8f2;
+            color: #17673f;
+        }
+
+        .campaign-status[data-state="loss"] {
+            border-color: #bd3030;
+            background: #fff4f2;
+            color: #a42c2c;
+        }
+
+        .campaign-status[data-state="break-even"] {
+            border-color: #c08a1a;
+            background: #fff9eb;
+            color: #805d15;
+        }
+
+        footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 18px;
+            color: #758699;
+            font-size: 10px;
+            line-height: 1.7;
+        }
+
+        @media (max-width: 800px) {
+            .calculator-layout { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 640px) {
+            .header-inner,
+            main { width: min(100% - 32px, 540px); }
+
+            .header-inner {
+                min-height: 68px;
+                flex-wrap: wrap;
+                gap: 4px 15px;
+                padding-top: 9px;
+            }
+
+            .brand { font-size: 14px; }
+            .brand-mark { width: 31px; height: 31px; }
+            .main-nav { gap: 16px; }
+            .nav-link { padding: 11px 0 12px; font-size: 11px; }
+            main { padding: 31px 0 36px; }
+            .page-intro { align-items: flex-start; flex-direction: column; gap: 14px; }
+            .currency-note { padding-top: 2px; }
+            .calculator-card,
+            .results-panel { padding: 16px; }
+            .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 13px; }
+            footer { flex-direction: column; gap: 4px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="brand" href="index.html" aria-label="Nexavira Shop হোম">
+                <span class="brand-mark" aria-hidden="true">N</span>
+                <span>Nexavira Shop</span>
+            </a>
+            <nav class="main-nav" aria-label="Main navigation">
+                <a class="nav-link" href="index.html">Business Tools</a>
+                <a class="nav-link" href="profit-loss.html" aria-current="page">Business Calculation</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-intro" aria-labelledby="page-title">
+            <div>
+                <p class="small-label">NEXAVIRA SHOP &nbsp; / &nbsp; BUSINESS CALCULATION</p>
+                <h1 id="page-title">Profit &amp; Loss হিসাব</h1>
+                <p class="intro-copy">অর্ডার, ডেলিভারি আর বিজ্ঞাপনের খরচ বসিয়ে ক্যাম্পেইনের আসল লাভটা দেখে নিন। ইনপুট বদলালেই হিসাব আপডেট হবে।</p>
+            </div>
+            <div class="currency-note"><strong>হিসাবের মুদ্রা</strong>বাংলাদেশি টাকা (৳)</div>
+        </section>
+
+        <div class="calculator-layout">
+            <form class="calculator-card" id="profit-loss-form">
+                <h2>হিসাবের তথ্য</h2>
+                <p>প্রতি অর্ডারের খরচ ও মোট ক্যাম্পেইন বাজেট লিখুন।</p>
+                <div class="calculator-fields">
+                    <div class="calculator-field">
+                        <label for="selling-price">বিক্রয়মূল্য / অর্ডার (৳)</label>
+                        <input id="selling-price" name="selling_price" type="number" step="any" value="449">
+                    </div>
+                    <div class="calculator-field">
+                        <label for="supplier-cost">সাপ্লায়ার খরচ / অর্ডার (৳)</label>
+                        <input id="supplier-cost" name="supplier_cost" type="number" step="any" value="240">
+                    </div>
+                    <div class="calculator-field">
+                        <label for="delivery-cost">আপনার ডেলিভারি খরচ / অর্ডার (৳)</label>
+                        <input id="delivery-cost" name="delivery_cost" type="number" step="any" value="0">
+                    </div>
+                    <div class="calculator-field">
+                        <label for="delivery-charge">ক্রেতার ডেলিভারি চার্জ (৳)</label>
+                        <input id="delivery-charge" name="delivery_charge" type="number" step="any" value="70">
+                    </div>
+                    <div class="calculator-field">
+                        <label for="sales-count">মোট বিক্রি / অর্ডার</label>
+                        <input id="sales-count" name="sales" type="number" step="any" value="40">
+                    </div>
+                    <div class="calculator-field">
+                        <label for="ad-budget">বিজ্ঞাপনের বাজেট ($)</label>
+                        <input id="ad-budget" name="ad_budget_usd" type="number" step="any" value="45">
+                    </div>
+                    <div class="calculator-field">
+                        <label for="usd-rate">ডলার থেকে টাকা বিনিময় হার (৳)</label>
+                        <input id="usd-rate" name="usd_rate" type="number" step="any" value="150">
+                    </div>
+                    <div class="calculator-field">
+                        <label for="other-cost">অন্যান্য খরচ / অর্ডার (৳)</label>
+                        <input id="other-cost" name="other_cost" type="number" step="any" value="0">
+                    </div>
+                </div>
+                <div class="calculator-actions">
+                    <button class="calculate-button" type="submit">হিসাব করুন</button>
+                    <button class="reset-button" type="reset">রিসেট</button>
+                </div>
+            </form>
+
+            <section class="results-panel" aria-labelledby="summary-title" aria-live="polite" aria-atomic="false">
+                <div class="results-heading">
+                    <h2 id="summary-title">ক্যাম্পেইনের হিসাব</h2>
+                    <p>আপনার দেওয়া তথ্য অনুযায়ী</p>
+                </div>
+                <div class="kpi-grid">
+                    <div class="kpi-card"><span>মোট আয়</span><output id="total-revenue">৳0</output></div>
+                    <div class="kpi-card"><span>নিট লাভ / ক্ষতি</span><output id="net-profit">৳0</output></div>
+                    <div class="kpi-card"><span>প্রতি অর্ডারে লাভ</span><output id="profit-per-order">৳0</output></div>
+                    <div class="kpi-card"><span>Break-even অর্ডার</span><output id="break-even-sales">N/A</output></div>
+                </div>
+
+                <section class="result-section" aria-labelledby="breakdown-title">
+                    <h3 id="breakdown-title">আয়-ব্যয়ের বিস্তারিত</h3>
+                    <dl class="breakdown-list">
+                        <div class="breakdown-row"><dt>পণ্যের বিক্রয়</dt><dd id="product-revenue">৳0</dd></div>
+                        <div class="breakdown-row"><dt>সাপ্লায়ার খরচ</dt><dd id="supplier-total">৳0</dd></div>
+                        <div class="breakdown-row"><dt>ডেলিভারি খরচ</dt><dd id="delivery-total">৳0</dd></div>
+                        <div class="breakdown-row"><dt>ক্রেতার ডেলিভারি আয়</dt><dd id="delivery-income">৳0</dd></div>
+                        <div class="breakdown-row"><dt>অন্যান্য খরচ</dt><dd id="other-total">৳0</dd></div>
+                        <div class="breakdown-row"><dt>বিজ্ঞাপন খরচ</dt><dd id="ad-cost">৳0</dd></div>
+                        <div class="breakdown-row"><dt>মোট খরচ</dt><dd id="total-cost">৳0</dd></div>
+                        <div class="breakdown-row"><dt>বিজ্ঞাপনের আগের লাভ</dt><dd id="gross-profit">৳0</dd></div>
+                        <div class="breakdown-row"><dt>নিট লাভ / ক্ষতি</dt><dd id="net-profit-detail">৳0</dd></div>
+                    </dl>
+                </section>
+
+                <section class="result-section" aria-labelledby="metrics-title">
+                    <h3 id="metrics-title">ক্যাম্পেইন মেট্রিক্স</h3>
+                    <div class="metric-grid">
+                        <div class="metric-item"><span>বিজ্ঞাপন খরচ / বিক্রি</span><output id="cost-per-sale">৳0</output></div>
+                        <div class="metric-item"><span>ROAS</span><output id="roas">0.00x</output></div>
+                        <div class="metric-item"><span>লাভের মার্জিন</span><output id="profit-margin">0.0%</output></div>
+                        <div class="metric-item"><span>সর্বোচ্চ বিজ্ঞাপন খরচ / বিক্রি</span><output id="max-cost-per-sale">৳0</output></div>
+                    </div>
+                </section>
+                <p class="campaign-status" id="campaign-status" data-state="break-even" role="status"></p>
+            </section>
+        </div>
+
+        <footer>
+            <span>এই হিসাব আপনার দেওয়া তথ্যের ভিত্তিতে। বাস্তব লাভে অন্যান্য চার্জও প্রভাব ফেলতে পারে।</span>
+            <span>Nexavira Shop · Business Calculation</span>
+        </footer>
+    </main>
+
+    <script>
+        (() => {
+            const form = document.getElementById("profit-loss-form");
+            const status = document.getElementById("campaign-status");
+            const fieldNames = [
+                "selling_price",
+                "supplier_cost",
+                "delivery_cost",
+                "delivery_charge",
+                "sales",
+                "ad_budget_usd",
+                "usd_rate",
+                "other_cost"
+            ];
+            const resetValues = {
+                selling_price: 0,
+                supplier_cost: 0,
+                delivery_cost: 0,
+                delivery_charge: 0,
+                sales: 0,
+                ad_budget_usd: 0,
+                usd_rate: 150,
+                other_cost: 0
+            };
+            const money = value => {
+                const amount = Math.abs(value).toLocaleString("en-US", { maximumFractionDigits: 0 });
+                return `${value < 0 ? "-" : ""}৳${amount}`;
+            };
+            const setText = (id, value) => {
+                document.getElementById(id).textContent = value;
+            };
+
+            function calculate() {
+                const values = Object.fromEntries(fieldNames.map(name => {
+                    const field = form.elements.namedItem(name);
+                    return [name, Number(field.value) || 0];
+                }));
+                const {
+                    selling_price: selling,
+                    supplier_cost: supplier,
+                    delivery_cost: deliveryCost,
+                    delivery_charge: deliveryCharge,
+                    sales,
+                    ad_budget_usd: adBudgetUsd,
+                    usd_rate: usdRate,
+                    other_cost: other
+                } = values;
+
+                const productRevenue = selling * sales;
+                const deliveryIncome = deliveryCharge * sales;
+                const supplierTotal = supplier * sales;
+                const deliveryTotal = deliveryCost * sales;
+                const otherTotal = other * sales;
+                const ads = adBudgetUsd * usdRate;
+                const totalRevenue = productRevenue + deliveryIncome;
+                const totalCost = supplierTotal + deliveryTotal + otherTotal + ads;
+                const gross = totalRevenue - supplierTotal - deliveryTotal - otherTotal;
+                const net = totalRevenue - totalCost;
+                const profitPerOrderBeforeAds = selling + deliveryCharge - supplier - deliveryCost - other;
+                const cpa = sales > 0 ? ads / sales : 0;
+                const roas = ads > 0 ? productRevenue / ads : 0;
+                const margin = totalRevenue > 0 ? net / totalRevenue * 100 : 0;
+                const maxCpa = Math.max(profitPerOrderBeforeAds, 0);
+                const breakEven = profitPerOrderBeforeAds > 0 ? ads / profitPerOrderBeforeAds : 0;
+
+                setText("total-revenue", money(totalRevenue));
+                setText("net-profit", money(net));
+                setText("profit-per-order", money(sales > 0 ? net / sales : 0));
+                setText("break-even-sales", breakEven ? breakEven.toLocaleString("en-US", { maximumFractionDigits: 1 }) : "N/A");
+                setText("product-revenue", money(productRevenue));
+                setText("supplier-total", money(supplierTotal));
+                setText("delivery-total", money(deliveryTotal));
+                setText("delivery-income", money(deliveryIncome));
+                setText("other-total", money(otherTotal));
+                setText("ad-cost", money(ads));
+                setText("total-cost", money(totalCost));
+                setText("gross-profit", money(gross));
+                setText("net-profit-detail", money(net));
+                setText("cost-per-sale", money(cpa));
+                setText("roas", `${roas.toFixed(2)}x`);
+                setText("profit-margin", `${margin.toFixed(1)}%`);
+                setText("max-cost-per-sale", money(maxCpa));
+
+                const profitColor = net >= 0 ? "#12804a" : "#bd3030";
+                document.getElementById("net-profit").style.color = profitColor;
+                document.getElementById("profit-per-order").style.color = profitColor;
+                document.getElementById("net-profit-detail").style.color = profitColor;
+
+                if (net > 0) {
+                    status.dataset.state = "profit";
+                    status.textContent = `● লাভ হচ্ছে • মোট লাভ ${money(net)}`;
+                } else if (net < 0) {
+                    status.dataset.state = "loss";
+                    status.textContent = `● ক্ষতি হচ্ছে • মোট ক্ষতি ${money(Math.abs(net))}`;
+                } else {
+                    status.dataset.state = "break-even";
+                    status.textContent = "● Break-even • লাভ বা ক্ষতি কোনোটিই নেই";
+                }
+            }
+
+            form.addEventListener("input", calculate);
+            form.addEventListener("submit", event => {
+                event.preventDefault();
+                calculate();
+            });
+            form.addEventListener("reset", event => {
+                event.preventDefault();
+                for (const [name, value] of Object.entries(resetValues)) {
+                    form.elements.namedItem(name).value = value;
+                }
+                calculate();
+            });
+
+            calculate();
+        })();
+    </script>
+</body>
+
+</html>
